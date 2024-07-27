@@ -19,6 +19,10 @@ server.listen(process.env.PORT, () => console.log('Https running on port', proce
 let rooms = {};
 let clients = {};
 
+setInterval(() => {
+    console.log("Rooms:", rooms)
+}, 500)
+
 const wss = new ws.Server({server, path: '/'});
 wss.on('connection', function connection(ws) { 
     console.log('A new connection has been established. Total clients: ', wss.clients.size);
@@ -36,6 +40,7 @@ wss.on('connection', function connection(ws) {
             console.error("Error parsing JSON, terminating connection.")
             return ws.close(1003, "Invalid JSON");
         }
+        if(msg.type !== "ping") console.log("Received>", msg)
         switch(msg.type){
             case "create":
                 create(ws);

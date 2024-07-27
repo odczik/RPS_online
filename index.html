@@ -7,16 +7,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="fps" style="color: white;"></div>
-    <div id="ping" style="color: white;"></div>
-    <div id="avgPing" style="color: white;"></div>
+    <div id="fps"></div>
+    <div id="ping"></div>
+    <div id="avgPing"></div>
 
     <div id="connTxt">Establishing connection with server.. <br><small>(may take up to a minute)</small></div>
     <div id="multiplayerCont">
         <button id="hostRoom">Host game</button>
         <button id="joinRoom">Join game</button>
     </div>
-    <div id="roomCont"></div>
+    <div id="roomCont">
+        <input type="text" id="roomCode" placeholder="Room code">
+        <button id="joinRoomBtn" onclick="joinRoom()">Join</button>
+    </div>
 
     <script src="main.js"></script>
 </body>
