@@ -27,10 +27,13 @@
         <button id="joinRoomBtn" onclick="joinRoom()">Join</button>
     </div>
     <div id="gameCont">
-        <div id="gameStatus"></div>
-        <button class="playBtns" id="rock" onclick="play('rock')">Rock</button>
-        <button class="playBtns" id="paper" onclick="play('paper')">Paper</button>
-        <button class="playBtns" id="scissors" onclick="play('scissors')">Scissors</button>
+        <div id="gameStatus">Choose your fighter!</div>
+        <div>
+            <button class="playBtns" id="⛰️" onclick="play('⛰️')">⛰️</button>
+            <button class="playBtns" id="📜" onclick="play('📜')">📜</button>
+            <button class="playBtns" id="✂️" onclick="play('✂️')">✂️</button>
+        </div>
+        <button id="playAgainBtn" onclick="playAgain()">Play again 0/2</button>
     </div>
 
     <script src="main.js"></script>

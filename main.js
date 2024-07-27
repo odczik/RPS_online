@@ -6,6 +6,8 @@ const ws = new WebSocket(address)
 let avgPing = 0;
 let avgPingCount = 0;
 
+let playersReady = 0;
+
 ws.onopen = () => {
     document.getElementById("connTxt").style.display = "none";
     document.getElementById("multiplayerCont").style.display = "block";
@@ -41,7 +43,7 @@ const joinRandomRoom = () => {
 
 ws.onmessage = (message) => {
     const msg = JSON.parse(message.data)
-    if(msg.type !== "pong") console.log("Received>", msg)
+    //if(msg.type !== "pong") console.log("Received>", msg)
     switch(msg.type){
         case "room":
             document.getElementById("hostCont").innerHTML = `<h1 style='color: white;'>Waiting for player...</h1>
@@ -51,7 +53,7 @@ ws.onmessage = (message) => {
             document.getElementById("hostCont").style.display = "none";
             document.getElementById("joinCont").style.display = "none";
 
-            document.getElementById("gameCont").style.display = "block";
+            document.getElementById("gameCont").style.display = "flex";
             break;
         case "stop":
             window.location.reload();
@@ -62,13 +64,32 @@ ws.onmessage = (message) => {
                     document.getElementById("gameStatus").innerText = "Opponent is waiting."
                     break;
                 case "draw":
-                    document.getElementById("gameStatus").innerText = "Draw!"
+                    document.getElementById("gameStatus").innerText = `Draw! Both players chose ${msg.thing}`
+                    document.getElementById("playAgainBtn").style.display = "block";
                     break;
                 case "win":
-                    document.getElementById("gameStatus").innerText = "You win!"
+                    document.getElementById("gameStatus").innerText = `You win! Opponent chose ${msg.thing}`
+                    document.getElementById("playAgainBtn").style.display = "block";
                     break;
                 case "lose":
-                    document.getElementById("gameStatus").innerText = "You lose!"
+                    document.getElementById("gameStatus").innerText = `You lose! Opponent chose ${msg.thing}`
+                    document.getElementById("playAgainBtn").style.display = "block";
+                    break;
+                case "playAgain":
+                    playersReady++;
+                    document.getElementById("playAgainBtn").innerText = `Play again ${playersReady}/2`
+                    break;
+                case "start":
+                    playersReady = 0;
+                    document.getElementById("playAgainBtn").innerText = `Play again ${playersReady}/2`
+                    document.getElementById("playAgainBtn").disabled = false
+
+                    document.getElementById("gameStatus").innerText = "Choose your fighter!"
+                    document.getElementById("playAgainBtn").style.display = "none";
+                    document.querySelectorAll(".playBtns").forEach(btn => {
+                        btn.classList.remove("active")
+                        btn.disabled = false;
+                    })
                     break;
             }
             break;
@@ -95,4 +116,11 @@ const play = (thing) => {
     playBtns.forEach(btn => btn.disabled = "true")
     playBtns.forEach(btn => btn.id === thing ? btn.classList.add("active") : null)
     ws.send(JSON.stringify({type: "update", value: thing}))
+    document.getElementById("gameStatus").innerText = "Waiting for opponent..."
+}
+const playAgain = () => {
+    playersReady++;
+    document.getElementById("playAgainBtn").innerText = `Play again ${playersReady}/2`
+    document.getElementById("playAgainBtn").disabled = true
+    ws.send(JSON.stringify({type: "update", updateType: "playAgain"}))
 }
