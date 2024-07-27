@@ -1,12 +1,24 @@
 const http = require('http');
 const ws = require('ws');
 require("dotenv").config()
+const fs = require('fs').promises;
 
 let server = http.createServer((req, res) => {
     switch(req.url){
         case "/":
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end();
+            //res.writeHead(200, { 'Content-Type': 'text/html' });
+            //res.end();
+            fs.readFile("../index.html")
+                .then(contents => {
+                    res.setHeader("Content-Type", "text/html");
+                    res.writeHead(200);
+                    res.end(contents);
+                })
+                .catch(err => {
+                    res.writeHead(500);
+                    res.end(err);
+                    return;
+                });
             break;
     }
     
