@@ -16,7 +16,13 @@
         <button id="hostRoom">Host game</button>
         <button id="joinRoom">Join game</button>
     </div>
-    <div id="roomCont">
+    <div id="hostCont">
+        <button id="hostPublicRoomBtn" onclick="hostRoom(true)">Host public room</button>
+        <button id="hostPrivateRoomBtn" onclick="hostRoom(false)">Host private room</button>
+    </div>
+    <div id="joinCont">
+        <button id="quickPlayBtn" onclick="joinRandomRoom()">Quick play</button>
+        <br>
         <input type="text" id="roomCode" placeholder="Room code">
         <button id="joinRoomBtn" onclick="joinRoom()">Join</button>
     </div>

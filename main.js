@@ -8,7 +8,7 @@ let avgPingCount = 0;
 
 ws.onopen = () => {
     document.getElementById("connTxt").style.display = "none";
-    document.getElementById("multiplayerCont").style.display = "flex";
+    document.getElementById("multiplayerCont").style.display = "block";
 
     console.log('WebSocket connection with server established.')
     setInterval(() => {
@@ -19,43 +19,37 @@ ws.onopen = () => {
 }
 
 document.getElementById("hostRoom").addEventListener("click", e => {
-    ws.send(JSON.stringify({type: "create"}))
-    document.getElementById("multiplayerCont").innerHTML = "<h1 style='color: white;'>Waiting for player...</h1>";
+    document.getElementById("multiplayerCont").style.display = "none";
+    document.getElementById("hostCont").style.display = "block";
 })
+const hostRoom = (public) => {
+    ws.send(JSON.stringify({type: "create", public}))
+    document.getElementById("hostCont").innerHTML = "<h1 style='color: white;'>Waiting for player...</h1>";
+}
+
 document.getElementById("joinRoom").addEventListener("click", e => {
     document.getElementById("multiplayerCont").style.display = "none";
-    document.getElementById("roomCont").style.display = "block";
+    document.getElementById("joinCont").style.display = "block";
 })
 const joinRoom = () => {
     const roomId = document.getElementById("roomCode").value;
     ws.send(JSON.stringify({type: "join", params: roomId}));
 }
+const joinRandomRoom = () => {
+    ws.send(JSON.stringify({type: "join", params: "random"}));
+}
 
 ws.onmessage = (message) => {
     const msg = JSON.parse(message.data)
-    //console.log(`Received>`, msg)
+    if(msg.type !== "pong") console.log("Received>", msg)
     switch(msg.type){
         case "room":
-            ws.send(JSON.stringify({type: "rooms"}))
-            break;
-        case "rooms":
-            document.getElementById("roomCont").innerHTML = "";
-            msg.value.forEach(room => {
-                const roomDiv = document.createElement("div");
-                roomDiv.classList.add("room");
-                roomDiv.innerText = room.id + " " + room.players + "/2";
-                roomDiv.addEventListener("click", e => {
-                    ws.send(JSON.stringify({type: "join", params: room.id}))
-                    document.getElementById("multiplayerCont").style.display = "none";
-                    document.getElementById("roomCont").style.display = "block";
-                })
-                document.getElementById("roomCont").appendChild(roomDiv);
-            })
+            document.getElementById("hostCont").innerHTML = `<h1 style='color: white;'>Waiting for player...</h1>
+                                                                    <h2 style='color: white;'>Room code: ${msg.value}</h2>`;
             break;
         case "start":
-            document.getElementById("multiplayerCont").style.display = "none";
-            document.getElementById("roomCont").style.display = "none";
-            document.querySelector("canvas").style.display = "block";
+            document.getElementById("hostCont").style.display = "none";
+            document.getElementById("joinCont").style.display = "none";
             update();
             break;
         case "stop":
@@ -64,6 +58,8 @@ ws.onmessage = (message) => {
         case "update":
             
             break;
+        case "error":
+            alert(msg.value)
         case "pong":
             let ping = Date.now() - msg.time;
             document.getElementById("ping").innerText = `Ping: ${ping}ms`

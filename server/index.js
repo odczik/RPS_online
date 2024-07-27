@@ -43,16 +43,13 @@ wss.on('connection', function connection(ws) {
         if(msg.type !== "ping") console.log("Received>", msg)
         switch(msg.type){
             case "create":
-                create(ws);
+                create(ws, msg.public);
                 break;
             case "join":
                 join(ws, msg.params);
                 break;
             case "leave":
                 leave(msg.params);
-                break;    
-            case "rooms":
-                ws.send(JSON.stringify({type: "rooms", value: getRooms()}));
                 break;
             case "update":
                 handleGameUpdate(ws, msg);
@@ -78,32 +75,28 @@ wss.on('connection', function connection(ws) {
             }
         }
         delete clients[ws.id];
-        updateRooms();
     })
 });
 
-const getRooms = () => {
-    return Object.values(rooms).map(room => ({id: room.id, players: room.players.length}));
-}
-const updateRooms = () => {
-    wss.clients.forEach(client => {
-        client.send(JSON.stringify({type: "rooms", value: getRooms()}));
-    })
-}
-
-const create = (ws) => {
+const create = (ws, public) => {
     let id = Math.random().toString(36).substring(7);
-    rooms[id] = { id, players: [ws] };
+    rooms[id] = { id, public, players: [ws] };
 
     clients[ws.id].room = id;
     clients[ws.id].host = true;
 
     ws.send(JSON.stringify({type: "room", value: id}));
-    updateRooms();
 }
 
 const join = (ws, id) => {
     if(clients[ws.id].room) return ws.send(JSON.stringify({type: "error", value: "You are already in a room.", client: clients[ws.id]}));
+    console.log("ID:", id)
+    id = id === "random" ? Object.keys(rooms).find(room => 
+        rooms[room].players.length === 1 &&
+        rooms[room].public
+    ) : id;
+    console.log("ID:", id)
+    if(id === undefined) return ws.send(JSON.stringify({type: "error", value: "No active rooms right now."}));
     if(!rooms[id]) return ws.send(JSON.stringify({type: "error", value: "Room not found."}));
     if(rooms[id].players.length >= 2) return ws.send(JSON.stringify({type: "error", value: "Room is full."}));
     
@@ -116,8 +109,6 @@ const join = (ws, id) => {
     rooms[id].players.forEach(player => {
         player.send(JSON.stringify({type: "start"}));
     })
-    
-    updateRooms();
 }
 
 const handleGameUpdate = (ws, msg) => {
