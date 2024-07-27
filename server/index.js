@@ -8,7 +8,7 @@ let server = http.createServer((req, res) => {
         case "/":
             //res.writeHead(200, { 'Content-Type': 'text/html' });
             //res.end();
-            fs.readFile("../index.html")
+            /*fs.readFile("../index.html")
                 .then(contents => {
                     res.setHeader("Content-Type", "text/html");
                     res.writeHead(200);
@@ -18,7 +18,7 @@ let server = http.createServer((req, res) => {
                     res.writeHead(500);
                     res.end(err);
                     return;
-                });
+                });*/
             break;
     }
     
