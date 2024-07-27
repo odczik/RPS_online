@@ -50,13 +50,27 @@ ws.onmessage = (message) => {
         case "start":
             document.getElementById("hostCont").style.display = "none";
             document.getElementById("joinCont").style.display = "none";
-            update();
+
+            document.getElementById("gameCont").style.display = "block";
             break;
         case "stop":
             window.location.reload();
             break;
         case "update":
-            
+            switch(msg.updateType){
+                case "oppWaiting":
+                    document.getElementById("gameStatus").innerText = "Opponent is waiting."
+                    break;
+                case "draw":
+                    document.getElementById("gameStatus").innerText = "Draw!"
+                    break;
+                case "win":
+                    document.getElementById("gameStatus").innerText = "You win!"
+                    break;
+                case "lose":
+                    document.getElementById("gameStatus").innerText = "You lose!"
+                    break;
+            }
             break;
         case "error":
             alert(msg.value)
@@ -74,4 +88,11 @@ ws.onmessage = (message) => {
 ws.onclose = (message) => {
     console.error("Connection closed:", message.reason)
     window.location.reload();
+}
+
+const play = (thing) => {
+    const playBtns = document.querySelectorAll(".playBtns")
+    playBtns.forEach(btn => btn.disabled = "true")
+    playBtns.forEach(btn => btn.id === thing ? btn.classList.add("active") : null)
+    ws.send(JSON.stringify({type: "update", value: thing}))
 }

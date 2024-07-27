@@ -112,7 +112,45 @@ const join = (ws, id) => {
 }
 
 const handleGameUpdate = (ws, msg) => {
+
     rooms[clients[ws.id].room].players.forEach(player => {
-        player.send(JSON.stringify({type: "update", value: msg.value}));
+        if(player === ws){
+            player.thing = msg.value;
+        } else {
+            player.send(JSON.stringify({type: "update", updateType: "oppWaiting"}));
+        }
     })
+    if( rooms[clients[ws.id].room].players[0].thing && 
+        rooms[clients[ws.id].room].players[1].thing ){
+
+        let player1 = rooms[clients[ws.id].room].players[0].thing;
+        let player2 = rooms[clients[ws.id].room].players[1].thing;
+
+        let result = null;
+        if(player1 === player2){
+            result = "draw";
+        } else if(player1 === "rock" && player2 === "scissors" ||
+                  player1 === "paper" && player2 === "rock" ||
+                  player1 === "scissors" && player2 === "paper"){
+            result = "player1";
+        } else {
+            result = "player2";
+        }
+
+        switch(result){
+            case "draw":
+                rooms[clients[ws.id].room].players.forEach(player => {
+                    player.send(JSON.stringify({type: "update", updateType: "draw"}));
+                })
+                break;
+            case "player1":
+                rooms[clients[ws.id].room].players[0].send(JSON.stringify({type: "update", updateType: "win"}));
+                rooms[clients[ws.id].room].players[1].send(JSON.stringify({type: "update", updateType: "lose"}));
+                break;
+            case "player2":
+                rooms[clients[ws.id].room].players[0].send(JSON.stringify({type: "update", updateType: "lose"}));
+                rooms[clients[ws.id].room].players[1].send(JSON.stringify({type: "update", updateType: "win"}));
+                break;
+        }
+    }
 }

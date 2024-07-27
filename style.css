@@ -5,6 +5,15 @@ body {
     color: white;
 }
 
-#hostCont, #joinCont {
+#hostCont, #joinCont, #gameCont {
     display: none;
+}
+
+.playBtns:disabled {
+    background-color: red;
+    color: white;
+}
+.playBtns:disabled.active {
+    background-color: green;
+    color: white;
 }
