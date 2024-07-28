@@ -51,7 +51,7 @@ const joinRandomRoom = () => {
 }
 
 const copyUrlCode = (code) => {
-    navigator.clipboard.writeText(`${window.location.href}/?code=${code}`)
+    navigator.clipboard.writeText(`${window.location.href}?code=${code}`)
     alert("Copied!")
 }
 
@@ -62,7 +62,7 @@ ws.onmessage = (message) => {
         case "room":
             document.getElementById("hostCont").innerHTML = `<h1 style='color: white;'>Waiting for player...</h1>
                                                                     <h2 style='color: white;'>Room code: ${msg.value}</h2>
-                                                                    <h3 style='color: white;'>${window.location.href}/?code=${msg.value}<button onclick="copyUrlCode('${msg.value}')">Copy</button></h3>`;
+                                                                    <h3 style='color: white;'>${window.location.href}?code=${msg.value}<button onclick="copyUrlCode('${msg.value}')">Copy</button></h3>`;
             break;
         case "start":
             document.getElementById("hostCont").style.display = "none";
