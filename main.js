@@ -18,6 +18,11 @@ ws.onopen = () => {
         avgPingCount = 0;
     }, 3000)
     ws.send(JSON.stringify({type: "ping", time: Date.now()}))
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    console.log(code)
+    if(code) joinRoom(code);
 }
 
 document.getElementById("hostRoom").addEventListener("click", e => {
@@ -33,8 +38,8 @@ document.getElementById("joinRoom").addEventListener("click", e => {
     document.getElementById("multiplayerCont").style.display = "none";
     document.getElementById("joinCont").style.display = "block";
 })
-const joinRoom = () => {
-    const roomId = document.getElementById("roomCode").value;
+const joinRoom = (code) => {
+    const roomId = code ? code : document.getElementById("roomCode").value;
     ws.send(JSON.stringify({type: "join", params: roomId}));
 }
 const joinRandomRoom = () => {
@@ -56,6 +61,7 @@ ws.onmessage = (message) => {
             document.getElementById("gameCont").style.display = "flex";
             break;
         case "stop":
+            alert("Opponent disconnected.")
             window.location.reload();
             break;
         case "update":
