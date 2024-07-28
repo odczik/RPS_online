@@ -8,6 +8,9 @@ let avgPingCount = 0;
 
 let playersReady = 0;
 
+const urlParams = new URLSearchParams(window.location.search);
+const code = urlParams.get('code');
+
 ws.onopen = () => {
     document.getElementById("connTxt").style.display = "none";
     document.getElementById("multiplayerCont").style.display = "block";
@@ -19,10 +22,11 @@ ws.onopen = () => {
     }, 3000)
     ws.send(JSON.stringify({type: "ping", time: Date.now()}))
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
     console.log(code)
-    //if(code) joinRoom(code);
+    if(code){
+        document.getElementById("multiplayerCont").style.display = "none";
+        joinRoom(code);
+    }
 }
 
 document.getElementById("hostRoom").addEventListener("click", e => {
@@ -46,13 +50,19 @@ const joinRandomRoom = () => {
     ws.send(JSON.stringify({type: "join", params: "random"}));
 }
 
+const copyUrlCode = (code) => {
+    navigator.clipboard.writeText(`${window.location.origin}/?code=${code}`)
+    alert("Copied!")
+}
+
 ws.onmessage = (message) => {
     const msg = JSON.parse(message.data)
     //if(msg.type !== "pong") console.log("Received>", msg)
     switch(msg.type){
         case "room":
             document.getElementById("hostCont").innerHTML = `<h1 style='color: white;'>Waiting for player...</h1>
-                                                                    <h2 style='color: white;'>Room code: ${msg.value}</h2>`;
+                                                                    <h2 style='color: white;'>Room code: ${msg.value}</h2>
+                                                                    <h3 style='color: white;'>${window.location.origin}/?code=${msg.value}<button onclick="copyUrlCode('${msg.value}')">Copy</button></h3>`;
             break;
         case "start":
             document.getElementById("hostCont").style.display = "none";
@@ -101,6 +111,7 @@ ws.onmessage = (message) => {
             break;
         case "error":
             alert(msg.value)
+            if(code && msg.value === "Room not found.") window.location.search = "";
         case "pong":
             let ping = Date.now() - msg.time;
             document.getElementById("ping").innerText = `Ping: ${ping}ms`

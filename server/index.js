@@ -1,7 +1,7 @@
 const http = require('http');
 const ws = require('ws');
 require("dotenv").config()
-const fs = require('fs').promises;
+// const fs = require('fs').promises;
 
 let server = http.createServer((req, res) => {
     switch(req.url){
