@@ -22,7 +22,7 @@ ws.onopen = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     console.log(code)
-    if(code) joinRoom(code);
+    //if(code) joinRoom(code);
 }
 
 document.getElementById("hostRoom").addEventListener("click", e => {

@@ -31,9 +31,9 @@ server.listen(process.env.PORT, () => console.log('Https running on port', proce
 let rooms = {};
 let clients = {};
 
-setInterval(() => {
-    console.log("Rooms:", rooms)
-}, 500)
+// setInterval(() => {
+//     console.log("Rooms:", rooms)
+// }, 500)
 
 const wss = new ws.Server({server, path: '/'});
 wss.on('connection', function connection(ws) { 
